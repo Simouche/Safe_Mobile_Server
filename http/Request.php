@@ -20,6 +20,9 @@ class Request implements IRequest
             foreach ($_POST as $key => $value) {
                 $body[$key] = filter_input(INPUT_POST, $key, FILTER_SANITIZE_SPECIAL_CHARS);
             }
+            $raw = file_get_contents("php://input");
+            if ($raw)
+                $body["raw"] = json_decode($raw, TRUE);
             return $body;
         }
     }

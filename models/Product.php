@@ -5,9 +5,30 @@ require_once "Autoload.php";
 class Product extends Model
 {
     const TABLE_NAME = "PRODUIT";
-    public string $codeBarre, $refProduit, $produit, $paHT, $tva, $paTTC, $pv1HT, $pv1TTC, $pv2HT, $pv2TTC, $pv3HT,
-        $pv3TTC, $stock, $datePer, $promo, $marque;
+    public string $codeBarre, $refProduit, $produit, $datePer, $marque;
+    public float $paHT, $tva, $paTTC, $pv1HT, $pv1TTC, $pv2HT, $pv2TTC, $pv3HT,
+        $pv3TTC, $promo, $stock;
     public array $barcodes;
+
+    const CODE_BARRE = "CODE_BARRE";
+    const REF_PRODUIT = "REF_PRODUIT";
+    const PRODUIT = "PRODUIT";
+    const PA_HT = "PA_HT";
+    const TVA = "TVA";
+    const PA_TTC = "PA_TTC";
+    const PAMP_HT = "PAMP_HT";
+    const PAMP_TTC = "PAMP_TTC";
+    const PV1_HT = "PV1_HT";
+    const PV1_TTC = "PV1_TTC";
+    const PV2_HT = "PV2_HT";
+    const PV2_TTC = "PV2_TTC";
+    const PV3_HT = "PV3_HT";
+    const PV3_TTC = "PV3_TTC";
+    const STOCK = "STOCK";
+    const MARQUE = "MARQUE";
+
+    const ALL_COLUMNS = [self::CODE_BARRE, self::REF_PRODUIT, self::PRODUIT, self::PA_HT, self::TVA,
+        self::PAMP_HT, self::PV1_HT, self::PV2_HT, self::PV3_HT, self::STOCK];
 
 
     /**
@@ -45,18 +66,18 @@ class Product extends Model
         $this->codeBarre = $codeBarre;
         $this->refProduit = $refProduit;
         $this->produit = $produit;
-        $this->paHT = $paHT;
-        $this->tva = $tva;
-        $this->paTTC = $paTTC;
-        $this->pv1HT = $pv1HT;
-        $this->pv1TTC = $pv1TTC;
-        $this->pv2HT = $pv2HT;
-        $this->pv2TTC = $pv2TTC;
-        $this->pv3HT = $pv3HT;
-        $this->pv3TTC = $pv3TTC;
-        $this->stock = $stock;
+        $this->paHT = doubleval($paHT);
+        $this->tva = doubleval($tva);
+        $this->paTTC = doubleval($paTTC);
+        $this->pv1HT = doubleval($pv1HT);
+        $this->pv1TTC = doubleval($pv1TTC);
+        $this->pv2HT = doubleval($pv2HT);
+        $this->pv2TTC = doubleval($pv2TTC);
+        $this->pv3HT = doubleval($pv3HT);
+        $this->pv3TTC = doubleval($pv3TTC);
+        $this->stock = doubleval($stock);
         $this->datePer = $datePer;
-        $this->promo = $promo;
+        $this->promo = doubleval($promo);
         $this->marque = $marque;
     }
 
@@ -75,11 +96,11 @@ class Product extends Model
         $statement = self::$DBConnection::prepareSelectStatement(self::TABLE_NAME);
         if ($statement->execute()) {
             $result = self::fetchResult($statement);
-            $response = array("status" => true, "message" => "all products", "data" => array("products" => $result));
+            $response = array("status" => true, "message" => "all products", "products" => $result);
 
             echo json_encode($response);
         } else {
-            echo json_encode(array("status" => false, "message" => "failed!", "data" => array()));
+            echo json_encode(array("status" => false, "message" => "failed!", "products" => array()));
         }
     }
 
@@ -106,15 +127,36 @@ class Product extends Model
                 null, "RECORDID NOT IN (" . implode(',', $ids) . ") ");
             if ($statement->execute()) {
                 $result = self::fetchResult($statement);
-                $response = array("status" => true, "message" => "all products", "data" => array("products" => $result));
-
-                echo json_encode($response);
+                $response = array("status" => true, "message" => "all products", "products" => $result);
             } else {
-                echo json_encode(array("status" => false, "message" => "failed", "data" => array()));
+                $response = array("status" => true, "message" => "all products", "products" => array());
             }
+            echo json_encode($response);
         } catch (InvalidArgumentException $exception) {
             echo $exception;
             return;
+        }
+    }
+
+    public static function addProducts(IRequest $request)
+    {
+        try {
+            $data = $request->getBody();
+//            error_log(json_encode($data),3,"logs/logs.json");
+            $products = $data["raw"];
+            $values = array();
+            foreach ($products as $row)
+                $values[] = [$row["produit"], $row["refProduit"], $row["produit"], $row["paHT"], $row["tva"],
+                    $row["steadyPurchasePriceHT"] ?? 0.0, $row["pv1HT"], $row["pv2HT"], $row["pv3HT"],
+                    $row["stock"]];
+
+            self::$DBConnection::prepareInsertStatement(self::TABLE_NAME, self::ALL_COLUMNS, $values);
+
+            $response = array("status" => true, "message" => "all products");
+            return json_encode($response);
+        } catch (InvalidArgumentException $exception) {
+            $response = array("status" => true, "message" => $exception->getMessage());
+            return json_encode($response);
         }
     }
 

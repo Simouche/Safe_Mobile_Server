@@ -4,4 +4,6 @@
 interface IRequest
 {
     public function getBody();
+
+    public function getQueries();
 }

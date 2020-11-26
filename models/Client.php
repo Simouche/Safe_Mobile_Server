@@ -101,17 +101,17 @@ class Client extends Model
         if ($statement->execute()) {
             $clients = [];
             while ($row = $statement->fetch()) {
-                array_push($clients, self::withParams($row["RECORDID"], utf8_encode($row["CODE_CLIENT"]), utf8_encode($row["CLIENT"]),
-                    utf8_encode($row["ACTIVITE"]), utf8_encode($row["CODE_POSTAL"]), utf8_encode($row["ADRESSE"]), utf8_encode($row["COMMUNE"]), utf8_encode($row["WILAYA"]), utf8_encode($row["CONTACT"]),
-                    utf8_encode($row["TEL"]), utf8_encode($row["FAX"]), utf8_encode($row["NUM_RC"]), utf8_encode($row["NUM_IF"]), utf8_encode($row["NUM_IS"]), utf8_encode($row["NUM_ART"]),
-                    utf8_encode($row["COMPTE"]), utf8_encode($row["RIB"]), utf8_encode($row["EMAIL"]), utf8_encode($row["SITE_WEB"]), utf8_encode($row["SOLDE_INI"]), utf8_encode($row["CREDIT_LIMIT"]),
-                    utf8_encode($row["SOLDE"]), utf8_encode($row["MODE_TARIF"]), utf8_encode($row["LATITUDE"]), utf8_encode($row["LONGITUDE"])));
+                array_push($clients, self::withParams($row["RECORDID"], self::utf($row["CODE_CLIENT"]), self::utf($row["CLIENT"]),
+                    self::utf($row["ACTIVITE"]), self::utf($row["CODE_POSTAL"]), self::utf($row["ADRESSE"]), self::utf($row["COMMUNE"]), self::utf($row["WILAYA"]), self::utf($row["CONTACT"]),
+                    self::utf($row["TEL"]), self::utf($row["FAX"]), self::utf($row["NUM_RC"]), self::utf($row["NUM_IF"]), self::utf($row["NUM_IS"]), self::utf($row["NUM_ART"]),
+                    self::utf($row["COMPTE"]), self::utf($row["RIB"]), self::utf($row["EMAIL"]), self::utf($row["SITE_WEB"]), self::utf($row["SOLDE_INI"]), self::utf($row["CREDIT_LIMIT"]),
+                    self::utf($row["SOLDE"]), self::utf($row["MODE_TARIF"]), self::utf($row["LATITUDE"]), self::utf($row["LONGITUDE"])));
             }
-            $response = array("status" => true, "message" => "all clients", "data" => array("clients" => $clients));
+            $response = array("status" => true, "message" => "all clients", "clients" => $clients);
 
             echo json_encode($response);
         } else {
-            echo json_encode(array("status" => true, "message" => "all clients", "data" => array()));
+            echo json_encode(array("status" => true, "message" => "all clients", "clients" => []));
         }
     }
 
@@ -139,13 +139,13 @@ class Client extends Model
             if ($statement->execute()) {
                 $clients = [];
                 while ($row = $statement->fetch()) {
-                    array_push($clients, self::withParams($row["RECORDID"], utf8_encode($row["CODE_CLIENT"]), utf8_encode($row["CLIENT"]),
-                        utf8_encode($row["ACTIVITE"]), utf8_encode($row["CODE_POSTAL"]), utf8_encode($row["ADRESSE"]), utf8_encode($row["COMMUNE"]), utf8_encode($row["WILAYA"]), utf8_encode($row["CONTACT"]),
-                        utf8_encode($row["TEL"]), utf8_encode($row["FAX"]), utf8_encode($row["NUM_RC"]), utf8_encode($row["NUM_IF"]), utf8_encode($row["NUM_IS"]), utf8_encode($row["NUM_ART"]),
-                        utf8_encode($row["COMPTE"]), utf8_encode($row["RIB"]), utf8_encode($row["EMAIL"]), utf8_encode($row["SITE_WEB"]), utf8_encode($row["SOLDE_INI"]), utf8_encode($row["CREDIT_LIMIT"]),
-                        utf8_encode($row["SOLDE"]), utf8_encode($row["MODE_TARIF"]), utf8_encode($row["LATITUDE"]), utf8_encode($row["LONGITUDE"])));
+                    array_push($clients, self::withParams($row["RECORDID"], self::utf($row["CODE_CLIENT"]), self::utf($row["CLIENT"]),
+                        self::utf($row["ACTIVITE"]), self::utf($row["CODE_POSTAL"]), self::utf($row["ADRESSE"]), self::utf($row["COMMUNE"]), self::utf($row["WILAYA"]), self::utf($row["CONTACT"]),
+                        self::utf($row["TEL"]), self::utf($row["FAX"]), self::utf($row["NUM_RC"]), self::utf($row["NUM_IF"]), self::utf($row["NUM_IS"]), self::utf($row["NUM_ART"]),
+                        self::utf($row["COMPTE"]), self::utf($row["RIB"]), self::utf($row["EMAIL"]), self::utf($row["SITE_WEB"]), self::utf($row["SOLDE_INI"]), self::utf($row["CREDIT_LIMIT"]),
+                        self::utf($row["SOLDE"]), self::utf($row["MODE_TARIF"]), self::utf($row["LATITUDE"]), self::utf($row["LONGITUDE"])));
                 }
-                $response = array("status" => true, "message" => "all clients", "data" => array("clients" => $clients));
+                $response = array("status" => true, "message" => "all clients", "clients" => $clients);
 
                 echo json_encode($response);
             } else {

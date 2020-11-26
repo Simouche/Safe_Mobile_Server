@@ -86,15 +86,16 @@ class Provider extends Model
         return $instance;
     }
 
-    public static function getProviders(){
+    public static function getProviders()
+    {
         $statement = self::$DBConnection::prepareSelectStatement(self::TABLE_NAME);
         if ($statement->execute()) {
             $result = self::fetchResult($statement);
-            $response = array("status" => true, "message" => "all providers", "data" => array("providers" => $result));
+            $response = array("status" => true, "message" => "all providers", "providers" => $result);
 
             echo json_encode($response);
         } else {
-            echo json_encode(array("status" => false, "message" => "failed!", "data" => array()));
+            echo json_encode(array("status" => false, "message" => "failed!", "providers" => []));
         }
     }
 
@@ -129,7 +130,7 @@ class Provider extends Model
                 self::utf($row["FAX"]), self:: utf($row["NUM_RC"]), self::utf($row["NUM_IF"]), self::utf($row["NUM_IS"]),
                 self::utf($row["NUM_ART"]), self::utf($row["COMPTE"]), self::utf($row["RIB"]), self::utf($row["EMAIL"]),
                 self::utf($row["SITE_WEB"]), self::utf($row["SOLDE_INI"]), utf8_encode($row["VERSER"]),
-                self::utf($row["SOLDE"]), self::utf($row["NOTES"]), self::utf($row["CODE_CLIENT"]));
+                doubleval(self::utf($row["SOLDE"])), self::utf($row["NOTES"]), intval(self::utf($row["CODE_CLIENT"])));
             array_push($providers, $provider);
         }
         return $providers;

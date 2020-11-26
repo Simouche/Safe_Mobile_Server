@@ -16,8 +16,12 @@ $router->get('/get-all-products', function () {
     return Product::getProducts();
 });
 
-$router->get('/get-all-providers',function (){
+$router->get('/get-all-providers', function () {
     return Provider::getProviders();
+});
+
+$router->post('/add-products', function (IRequest $request) {
+    return Product::addProducts($request);
 });
 
 //$router->

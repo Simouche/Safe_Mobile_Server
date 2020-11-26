@@ -27,10 +27,41 @@ class DBConnector
         return self::$connection;
     }
 
-    public static function prepareSelectStatement(string $tableName, array $columns = Null, array $whereArgs = Null, array $whereValues = Null,
-                                           string $specialWhere = Null, int $limit = Null, string $orderBy = Null)
+    public static function prepareInsertStatement(string $tableName, array $columns, array $values)
     {
+        if (!isset($columns) or !isset($values))
+            throw new InvalidArgumentException("you should provide the columns and the values");
 
+        $placeholders = [];
+        foreach ($columns as $value)
+            $placeholders[] = "?";
+
+        $query = "INSERT INTO $tableName (" . implode(",", $columns) . ") VALUES (" . implode(",", $placeholders) . ");";
+        $statement = self::$DBConnection->prepare($query);
+
+        if ($statement == false)
+            throw new InvalidArgumentException("Failed to compile this query: $query");
+
+        try {
+            self::$DBConnection->setAttribute(PDO::ATTR_AUTOCOMMIT, 0);
+            self::$DBConnection->beginTransaction();
+            foreach ($values as $row)
+                $statement->execute($row);
+            self::$DBConnection->commit();
+            self::$DBConnection->setAttribute(PDO::ATTR_AUTOCOMMIT, 1);
+            return true;
+        } catch (Exception $exception) {
+            self::$DBConnection->rollBack();
+            self::$DBConnection->setAttribute(PDO::ATTR_AUTOCOMMIT, 1);
+            return $exception->getMessage();
+        }
+
+
+    }
+
+    public static function prepareSelectStatement(string $tableName, array $columns = Null, array $whereArgs = Null, array $whereValues = Null,
+                                                  string $specialWhere = Null, int $limit = Null, string $orderBy = Null)
+    {
         if (isset($whereArgs) and !isset($whereValues))
             throw new InvalidArgumentException("parameter whereArgs is provided, you should provide whereValues argument too.");
         if (isset($whereArgs) and isset($whereValues) and sizeof($whereValues) != sizeof($whereArgs))
