@@ -26,8 +26,9 @@ class Product extends Model
     const PV3_TTC = "PV3_TTC";
     const STOCK = "STOCK";
     const MARQUE = "MARQUE";
+    const NBR_CB = "NBR_CB";
 
-    const ALL_COLUMNS = [self::CODE_BARRE, self::REF_PRODUIT, self::PRODUIT, self::PA_HT, self::TVA,
+    const ALL_COLUMNS = [self::CODE_BARRE, self::REF_PRODUIT, self::PRODUIT, self::NBR_CB, self::PA_HT, self::TVA,
         self::PAMP_HT, self::PV1_HT, self::PV2_HT, self::PV3_HT, self::STOCK];
 
 
@@ -96,6 +97,10 @@ class Product extends Model
         $statement = self::$DBConnection::prepareSelectStatement(self::TABLE_NAME);
         if ($statement->execute()) {
             $result = self::fetchResult($statement);
+            $resultWithBarcode = array();
+            foreach ($result as $product) {
+                $resultWithBarcode[] = [Barcode::getBarcodes($product->codeBarre)];
+            }
             $response = array("status" => true, "message" => "all products", "products" => $result);
 
             echo json_encode($response);
@@ -142,15 +147,20 @@ class Product extends Model
     {
         try {
             $data = $request->getBody();
-//            error_log(json_encode($data),3,"logs/logs.json");
+//            error_log(json_encode($data), 3, "logs/logs.json");
             $products = $data["raw"];
             $values = array();
-            foreach ($products as $row)
-                $values[] = [$row["produit"], $row["refProduit"], $row["produit"], $row["paHT"], $row["tva"],
-                    $row["steadyPurchasePriceHT"] ?? 0.0, $row["pv1HT"], $row["pv2HT"], $row["pv3HT"],
-                    $row["stock"]];
+            $barcodes = array();
 
+            foreach ($products as $row) {
+                $values[] = [$row["barcodes"][0]["code"], $row["product"]["refProduit"], $row["product"]["produit"], sizeof($row["barcodes"]),
+                    $row["product"]["paHT"], $row["product"]["tva"], $row["product"]["steadyPurchasePriceHT"],
+                    $row["product"]["pv1HT"], $row["product"]["pv2HT"], $row["product"]["pv3HT"], $row["product"]["stock"]];
+                $barcodes[] = $row["barcodes"];
+            }
             self::$DBConnection::prepareInsertStatement(self::TABLE_NAME, self::ALL_COLUMNS, $values);
+
+            Barcode::insertBarcodes($barcodes);
 
             $response = array("status" => true, "message" => "all products");
             return json_encode($response);

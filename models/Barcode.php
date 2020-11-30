@@ -7,6 +7,11 @@ class Barcode extends Model
     private const TABLE_NAME = "CODEBARRE";
     public string $codeBar, $codeBareSyn;
 
+    const CODE_BARRE = "CODE_BARRE";
+    const CODE_BARRE_SYN = "CODE_BARRE_SYN";
+
+    const ALL_COLUMNS = [self::CODE_BARRE, self::CODE_BARRE_SYN];
+
     /**
      * Barcode constructor.
      */
@@ -55,5 +60,14 @@ class Barcode extends Model
                 self::utf($row["CODE_BARRE_SYN"])));
         }
         return $codes;
+    }
+
+    public static function insertBarcodes($barcodesArray)
+    {
+        $values = array();
+        foreach ($barcodesArray as $item)
+            foreach ($item as $barcode)
+                $values[] = [$item[0]["code"], $barcode["code"]];
+        self::$DBConnection::prepareInsertStatement(self::TABLE_NAME, self::ALL_COLUMNS, $values);
     }
 }

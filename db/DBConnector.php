@@ -117,4 +117,8 @@ class DBConnector
         return $statement;
     }
 
+    public static function executeRawQuery(string $query){
+        return self::$DBConnection->query($query);
+    }
+
 }

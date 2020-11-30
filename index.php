@@ -24,4 +24,9 @@ $router->post('/add-products', function (IRequest $request) {
     return Product::addProducts($request);
 });
 
+$router->post('/add-purchases', function (IRequest $request) {
+    error_log("hit\n", 3, "logs/access.txt");
+    return Purchase::addPurchases($request);
+});
+
 //$router->
